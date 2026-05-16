@@ -1,0 +1,38 @@
+name: Build FileSplitter EXE
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+    
+    - name: Compile VB.NET to EXE
+      shell: cmd
+      run: |
+        vbc.exe /rootnamespace:FileSplitterApp ^
+          /target:winexe ^
+          /out:FileSplitter.exe ^
+          /optimize+ ^
+          /debug- ^
+          /reference:System.Windows.Forms.dll ^
+          /reference:System.Drawing.dll ^
+          /reference:System.Text.Json.dll ^
+          FileSplitter.vb
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: FileSplitter-EXE
+        path: FileSplitter.exe
+        retention-days: 90
